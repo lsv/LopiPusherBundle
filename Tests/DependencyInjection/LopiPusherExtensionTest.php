@@ -3,6 +3,7 @@
 namespace Lopi\Bundle\PusherBundle\Tests\DependencyInjection;
 
 use Lopi\Bundle\PusherBundle\DependencyInjection\LopiPusherExtension;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -33,12 +34,10 @@ class PusherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('app_id', $container->getParameter('lopi_pusher.config')['app_id']);
         $this->assertEquals('key', $container->getParameter('lopi_pusher.config')['key']);
         $this->assertEquals('secret', $container->getParameter('lopi_pusher.config')['secret']);
+        $this->assertEquals('us-east-1', $container->getParameter('lopi_pusher.config')['cluster']);
         $this->assertEquals('acme_service_id', $container->getParameter('lopi_pusher.config')['auth_service_id']);
+        $this->assertEquals(30, $container->getParameter('lopi_pusher.config')['timeout']);
         $this->assertFalse($container->getParameter('lopi_pusher.config')['debug']);
-        $this->assertEquals('http', $container->getParameter('lopi_pusher.config')['scheme']);
-        $this->assertEquals('api.pusherapp.com', $container->getParameter('lopi_pusher.config')['host']);
-        $this->assertEquals('80', $container->getParameter('lopi_pusher.config')['port']);
-        $this->assertEquals('30', $container->getParameter('lopi_pusher.config')['timeout']);
         $this->assertEquals('acme_service_id', (string) $container->getAlias('lopi_pusher.authenticator'));
     }
 
@@ -50,11 +49,12 @@ class PusherTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $configs = [
             'lopi_pusher' => [
-                'url' => 'http://key:secret@api-eu.pusher.com/apps/app_id',
+                'app_id' => '12345',
+                'key' => '54321',
+                'secret' => 'thisisasecret',
                 'cluster' => 'cluster',
+                'timeout' => 60,
                 'debug' => true,
-                'port' => '443',
-                'timeout' => '60',
                 'auth_service_id' => 'acme_service_id',
             ],
         ];
@@ -65,14 +65,26 @@ class PusherTest extends \PHPUnit_Framework_TestCase
         $pusherSettings = $pusher->getSettings();
 
         $this->assertInstanceOf('Pusher', $pusher);
-        $this->assertEquals('app_id', $pusherSettings['app_id']);
-        $this->assertEquals('key', $pusherSettings['auth_key']);
-        $this->assertEquals('secret', $pusherSettings['secret']);
-        $this->assertEquals('cluster', $container->getParameter('lopi_pusher.config')['cluster']);
+        $this->assertEquals('12345', $pusherSettings['app_id']);
+        $this->assertEquals('54321', $pusherSettings['auth_key']);
+        $this->assertEquals('thisisasecret', $pusherSettings['secret']);
+        $this->assertEquals(60, $pusherSettings['timeout']);
         $this->assertTrue($pusherSettings['debug']);
-        $this->assertEquals('api-eu.pusher.com', $pusherSettings['host']);
-        $this->assertEquals('443', $pusherSettings['port']);
-        $this->assertEquals('60', $pusherSettings['timeout']);
         $this->assertEquals('acme_service_id', (string) $container->getAlias('lopi_pusher.authenticator'));
+    }
+
+    public function testNotFullyConfiguration()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $container = new ContainerBuilder();
+        $configs = [
+            'lopi_pusher' => [
+                'cluster' => 'cluster',
+                'debug' => true,
+                'auth_service_id' => 'acme_service_id',
+            ],
+        ];
+        $extension = new LopiPusherExtension();
+        $extension->load($configs, $container);
     }
 }

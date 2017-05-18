@@ -42,33 +42,11 @@ and make a note of your API key before continuing.
 
 ### General
 
-To start, you'll need to setup a bit of configuration. 
+To start, you'll need to setup a bit of configuration.
 
-This is the default configuration in yml:
+##### Keys
 
-```yml
-# app/config/config.yml
-lopi_pusher:
-    # Default configuration
-    scheme: http
-    host: api.pusherapp.com
-    port: 80
-    cluster: us-east-1 # Change the cluster name
-    timeout: 30
-    debug: false # true if you want use the debug of all requests
-```
-
-You must set the `url` parameter :
-
-```yml
-# app/config/config.yml
-lopi_pusher:
-    url: <scheme>://<key>:<secret>@<host>[:<port>]/apps/<app-id>
-```
-
-It will parse the URL and set, or replace the default value if exists, the various parameters `scheme`, `key`, `secret`, `host`, `port` and `app_id`
-
-Or you can set the various parameters separately :
+You will need to set your `app_id`, `key` and `secret` from pusher
 
 ```yml
 # app/config/config.yml
@@ -78,16 +56,41 @@ lopi_pusher:
 	secret: <secret>
 ```
 
-By default, calls will be made over a non-encrypted connection. To change this to
-make calls over HTTPS, simply:
+##### Cluster
+
+If you are using another cluster than `us-east-1` you will also need to change this
 
 ```yml
 # app/config/config.yml
 lopi_pusher:
-    # ...
-	scheme: https
-    port: 443
+	cluster: <your-cluster>
 ```
+
+##### Encryption
+
+By default, all calls are encrypted, if you have setup your pusher to not encrypt messages, you will need to turn this off:
+
+```yml
+# app/config/config.yml
+lopi_pusher:
+    encrypted: false
+```
+
+##### Default configuration
+
+This is the default configuration in yml:
+
+```yml
+# app/config/config.yml
+lopi_pusher:
+    # Default configuration
+    cluster: us-east-1
+    encrypted: true
+    timeout: 30
+    debug: false # true if you want use the debug of all requests
+```
+
+##### Private or presence channels
 
 If you want to use private or presence channels, set the parameter `auth_service_id`
 
