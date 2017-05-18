@@ -19,19 +19,24 @@ class TwigExtension extends \Twig_Extension
     {
         return [
             new \Twig_Function('pusherjs', [$this, 'getPusherJs'], [
-                'is_safe' => 'html'
+                'is_safe' => ['html']
             ])
         ];
     }
 
     public function getPusherJs()
     {
-        return sprintf(
-            "new Pusher('%s', {cluster: '%s', encrypted: %s});",
+        $output = '';
+        if ($this->config['debug']) {
+            $output = 'Pusher.logToConsole = true;';
+        }
+        $output .= sprintf(
+            'var pusher = new Pusher("%s", {cluster: "%s", encrypted: %s});',
             $this->config['key'],
             $this->config['cluster'],
             $this->config['encrypted'] ? 'true' : 'false'
         );
+        return $output;
     }
 
 
