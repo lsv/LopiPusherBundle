@@ -51,9 +51,9 @@ You will need to set your `app_id`, `key` and `secret` from pusher
 ```yml
 # app/config/config.yml
 lopi_pusher:
-	app_id: <app-id>
-	key: <key>
-	secret: <secret>
+    app_id: <app-id>
+    key: <key>
+    secret: <secret>
 ```
 
 ##### Cluster
@@ -63,7 +63,7 @@ If you are using another cluster than `us-east-1` you will also need to change t
 ```yml
 # app/config/config.yml
 lopi_pusher:
-	cluster: <your-cluster>
+    cluster: <your-cluster>
 ```
 
 ##### Encryption
