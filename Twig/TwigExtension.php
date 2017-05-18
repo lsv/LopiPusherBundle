@@ -31,9 +31,13 @@ class TwigExtension extends \Twig_Extension
     {
         $config = $this->config;
         $keys = ['key', 'cluster', 'encrypted'];
-        return json_encode(array_map(function ($key) use ($config) {
-            return [$key => $config[$key]];
-        }, $keys));
+
+        $output = [];
+        foreach ($keys as $key) {
+            $output[$key] = $config[$key];
+        }
+
+        return json_encode($output);
     }
 
 
